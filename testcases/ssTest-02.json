@@ -1,0 +1,442 @@
+[
+  {
+    "config": {
+      "name": "未投保(没有编辑基本信息)-投保-取消投保-未投保",
+      "variables": [
+        {
+          "eq": [
+            "status_code",
+            200
+          ]
+        }
+      ],
+      "request": {
+        "base_url": "$base_url",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie1",
+
+          "Content-Type": "$contentType"
+        }
+      }
+    }
+  },
+  {
+    "test": {
+      "name": "获取当前登录用户权限",
+      "request": {
+        "url": "/p_getCurrentUserAuth",
+        "method": "GET",
+        "json": {
+        }
+      },
+      "extract": [
+        {
+          "roleKeys": "content.result.roleKeys"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ],
+          "eq": [
+            "content.result.roleKeys.0",
+            "ss_admin"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "筛选未投保的员工--未编辑基本信息",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds":"21636250621027998725",
+          "page": 1,
+          "pageSize": 10
+        }
+      },
+      "extract": [
+        {
+          "userId": "content.result.data.0.userId",
+          "userName": "content.result.data.0.userName"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取城市列表",
+      "request": {
+        "url": "getCities",
+        "method": "GET"
+      },
+      "extract": [
+        {
+          "cityCode": "content.result.4.cityCode",
+          "cityName": "content.result.4.cityName"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取开票抬头",
+      "request": {
+        "url": "getSSOrgIdAndInvoiceHead",
+        "method": "GET",
+        "json": {
+          "cityCode": "$cityCode",
+          "type": 0
+        }
+      },
+      "extract": [
+        {
+          "ssOrgId": "content.result.0.ssOrgId",
+          "invoiceId": "content.result.0.invoiceId",
+          "invoiceName": "content.result.0.invoiceName",
+          "ssOrgName": "content.result.0.ssOrgName"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "根据参保城市获取方案",
+      "request": {
+        "url": "getSchemesByCityCode",
+        "method": "GET",
+        "json": {
+          "ssOrgId": "$ssOrgId",
+          "cityCode": "$cityCode",
+          "type": 0
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "根据社保方案ID获取基数范围及最早的投保时间--社保",
+      "request": {
+        "url": "getBaseAndDateBySchemeId",
+        "method": "GET",
+        "json": {
+          "schemeId": "$schemeId1",
+          "type": 1
+        }
+      },
+      "extract": [
+        {
+          "baseNum1": "content.result.baseMin",
+          "startDate1": "content.result.startDate",
+          "supplementPayMonths": "content.result.supplementPayMonths.0.label"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "根据社保方案ID获取基数范围及最早的投保时间--公积金",
+      "request": {
+        "url": "getBaseAndDateBySchemeId",
+        "method": "GET",
+        "json": {
+          "schemeId": "$schemeId2",
+          "type": 2
+        }
+      },
+      "extract": [
+        {
+          "baseNum2": "content.result.baseMin",
+          "startDate2": "content.result.startDate"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "立即投保--不补缴,无暂不办理",
+      "request": {
+        "url": "saveInsured",
+        "method": "POST",
+        "json": {
+          "userId": "$userId",
+          "userName": "$userName",
+          "position": "",
+          "workPlace": "",
+          "ssInfo": {
+            "isOff": false,
+            "cityCode": "$cityCode",
+            "invoiceId": "$invoiceId",
+            "ssOrgId": "$ssOrgId",
+            "schemeId": "$schemeId1",
+            "baseNum": "$baseNum1",
+            "startDate": "$startDate1",
+            "firstInsuredType": 2,
+            "forcePaymentMonths": [
+            ]
+          },
+          "hfInfo": {
+            "isOff": false,
+            "cityCode": "$cityCode",
+            "invoiceId": "$invoiceId",
+            "ssOrgId": "$ssOrgId",
+            "schemeId": "$schemeId2",
+            "baseNum": "$baseNum2",
+            "startDate": "$startDate2",
+            "firstInsuredType": 1,
+            "forcePaymentMonths": [
+            ]
+          }
+        }
+      },
+      "extract": {
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ],
+      "teardown_hooks": [
+          "${teardown_hook_sleep_N_secs($response, 2)}"
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取该投保员工信息",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "$userId"
+        }
+      },
+      "extract": [
+        {
+          "hf_insuerdInfoId": "content.result.data.0.hfInfo.ssId",
+          "ss_insuerdInfoId": "content.result.data.0.ssInfo.ssId"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfInfo.status",
+            "2"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfInfo.subStatus",
+            "0"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssInfo.status",
+            "2"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssInfo.subStatus",
+            "0"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test":{
+      "name":"获取首页待办事项人数",
+      "request":{
+        "url":"queryHPNotice",
+        "method": "GET",
+        "json": {
+
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.result.0.value",
+            "$a"
+          ],
+          "eq": [
+            "content.result.3.value",
+            "$c"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "取消投保--社保",
+      "request": {
+        "url": "offInsuredInfo",
+        "method": "POST",
+        "json": {
+          "insuerdInfoId": "$ss_insuerdInfoId"
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "取消投保--公积金",
+      "request": {
+        "url": "offInsuredInfo",
+        "method": "POST",
+        "json": {
+          "insuerdInfoId": "$hf_insuerdInfoId"
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ],
+      "teardown_hooks": [
+          "${teardown_hook_sleep_N_secs($response, 2)}"
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取该投保员工信息",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "$userId"
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfInfo.status",
+            "1"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfInfo.subStatus",
+            "3"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssInfo.status",
+            "1"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssInfo.subStatus",
+            "3"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test":{
+      "name":"获取首页待办事项人数",
+      "request":{
+        "url":"queryHPNotice",
+        "method": "GET",
+        "json": {
+
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.result.0.value",
+            "$b"
+          ]
+        }
+      ]
+    }
+  }
+]

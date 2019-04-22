@@ -1,0 +1,823 @@
+[
+  {
+    "config": {
+      "name": "批量投保-正常在缴-正常在缴-批量停保-已停保",
+      "variables": [
+        {
+          "eq": [
+            "status_code",
+            200
+          ]
+        }
+      ],
+      "request": {
+        "base_url": "$base_url",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie1",
+          "X-csrf-token": "$token",
+          "Content-Type": "$contentType"
+        }
+      }
+    }
+  },
+  {
+    "test": {
+      "name": "获取当前登录用户权限",
+      "request": {
+        "url": "/p_getCurrentUserAuth",
+        "method": "GET",
+        "json": {
+        }
+      },
+      "extract": [
+        {
+          "roleKeys": "content.result.roleKeys"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ],
+          "eq": [
+            "content.result.roleKeys.0",
+            "ss_admin"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取该员工信息",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "0358360921787675358",
+          "page": 1,
+          "pageSize": 10
+        }
+      },
+      "extract": [
+        {
+          "userId": "content.result.data.0.userId",
+          "userName": "content.result.data.0.userName"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "保存基本信息",
+      "request": {
+        "url": "saveBaseInfo",
+        "method": "POST",
+        "json": {
+          "idCard": "610528199809080981",
+          "mobile": "15114878782",
+          "realName": "$userName",
+          "userId": "$userId"
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取批量投保列表f--批量投保",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "ssStatus": "1",
+          "ssStatus": "6",
+          "ssStatus": "8",
+          "ssStatus": "9",
+          "ssStatus": "99",
+          "hfStatus": "1",
+          "hfStatus": "6",
+          "hfStatus": "8",
+          "hfStatus": "9",
+          "hfStatus": "99",
+          "page": 1,
+          "pageSize": 10
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "该员工批量投保--批量投保",
+      "request": {
+        "url": "queryExcelInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "0358360921787675358"
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.userName",
+            "批量投保"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取城市列表",
+      "request": {
+        "url": "getCities",
+        "method": "GET"
+      },
+      "extract": [
+        {
+          "cityCode": "content.result.4.cityCode",
+          "cityName": "content.result.4.cityName"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取开票抬头",
+      "request": {
+        "url": "getSSOrgIdAndInvoiceHead",
+        "method": "GET",
+        "json": {
+          "cityCode": 310100,
+          "type": 0
+        }
+      },
+      "extract": [
+        {
+          "ssOrgId": "content.result.0.ssOrgId",
+          "invoiceId": "content.result.0.invoiceId",
+          "invoiceName": "content.result.0.invoiceName",
+          "ssOrgName": "content.result.0.ssOrgName"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "根据参保城市获取方案",
+      "request": {
+        "url": "getSchemesByCityCode",
+        "method": "GET",
+        "json": {
+          "ssOrgId": "$ssOrgId",
+          "cityCode": "$cityCode",
+          "type": 0
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "根据社保方案ID获取基数范围及最早的投保时间--社保",
+      "request": {
+        "url": "getBaseAndDateBySchemeId",
+        "method": "GET",
+        "json": {
+          "schemeId": "$schemeId1",
+          "type": 1
+        }
+      },
+      "extract": [
+        {
+          "baseNum1": "content.result.baseMin",
+          "startDate1": "content.result.startDate",
+          "supplementPayMonths": "content.result.supplementPayMonths.0.label"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "根据社保方案ID获取基数范围及最早的投保时间--公积金",
+      "request": {
+        "url": "getBaseAndDateBySchemeId",
+        "method": "GET",
+        "json": {
+          "schemeId": "$schemeId2",
+          "type": 2
+        }
+      },
+      "extract": [
+        {
+          "baseNum2": "content.result.baseMin",
+          "startDate2": "content.result.startDate"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "批量投保--不补缴,无暂不办理",
+      "request": {
+        "url": "batchSaveInsured",
+        "method": "POST",
+        "json": [
+          {
+            "userId": "$userId",
+            "userName": "$userName",
+            "position": "",
+            "workPlace": "",
+            "ssIsOff": false,
+            "ssCityCode": "$cityCode",
+            "ssInvoiceId": "$invoiceId",
+            "ssOrgId": "$ssOrgId",
+            "ssSchemeId": "$schemeId1",
+            "ssBaseNum": "$baseNum1",
+            "ssStartDate": "$startDate1",
+            "ssFirstInsuredType": 2,
+            "ssSupplementPayMonths": "",
+            "hfIsOff": false,
+            "hfCityCode": "$cityCode",
+            "hfInvoiceId": "$invoiceId",
+            "hfSSOrgId": "$ssOrgId",
+            "hfSchemeId": "$schemeId2",
+            "hfBaseNum": "$baseNum2",
+            "hfStartDate": "$startDate2",
+            "hfFirstInsuredType": 2,
+            "hfSupplementPayMonths": ""
+          }
+        ]
+      },
+      "extract": {
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取该投保员工信息",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "$userId"
+        }
+      },
+      "extract": [
+        {
+          "hf_declarationId": "content.result.data.0.hfInfo.declarationId",
+          "ss_declarationId": "content.result.data.0.ssInfo.declarationId",
+          "hf_ssId": "content.result.data.0.hfInfo.ssId",
+          "ss_ssId": "content.result.data.0.ssInfo.ssId"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "V-获取大库增员列表",
+      "request": {
+        "url": "http://test-hradmin.renliwo.com/rest/api/0.2/v.web.declaration.getToDoOrderList",
+        "method": "POST",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie2",
+          "Content-Type": "$contentType",
+          "X-CSRF-TOKEN": "$TOKEN"
+        },
+        "json": {
+          "appId": "wowoohr_my_rm",
+          "productType": [
+          ],
+          "payMonth": "",
+          "beginDate": "",
+          "endDate": "",
+          "city": [
+          ],
+          "insuranceType": [
+          ],
+          "cancelOrderMark": "",
+          "nameOrIdCard": "",
+          "pageNum": 1,
+          "pageSize": 20,
+          "danlihuType": 1
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "V-筛选出员工增员账单",
+      "request": {
+        "url": "http://test-hradmin.renliwo.com/rest/api/0.2/v.web.declaration.getToDoOrderList",
+        "method": "POST",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie2",
+          "Content-Type": "$contentType",
+          "X-CSRF-TOKEN": "$TOKEN"
+        },
+        "json": {
+          "appId": "wowoohr_my_rm",
+          "productType": [
+          ],
+          "payMonth": "",
+          "beginDate": "",
+          "endDate": "",
+          "city": [
+          ],
+          "insuranceType": [
+          ],
+          "cancelOrderMark": "",
+          "nameOrIdCard": "$userName",
+          "pageNum": 1,
+          "pageSize": 20,
+          "danlihuType": 1
+        }
+      },
+      "extract": [
+        {
+          "orderId1": "content.result.list.1.orderId",
+          "orderId2": "content.result.list.0.orderId"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "V-增员完成-社保",
+      "request": {
+        "url": "http://test-hradmin.renliwo.com/rest/api/0.2/v.web.declaration.applied",
+        "method": "POST",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie2",
+          "Content-Type": "$contentType",
+          "X-CSRF-TOKEN": "$TOKEN"
+        },
+        "json": {
+          "appId": "wowoohr_my_rm",
+          "danlihuType": 1,
+          "orderId": "$orderId1"
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "V-增员完成-公积金",
+      "request": {
+        "url": "http://test-hradmin.renliwo.com/rest/api/0.2/v.web.declaration.applied",
+        "method": "POST",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie2",
+          "Content-Type": "$contentType",
+          "X-CSRF-TOKEN": "$TOKEN"
+        },
+        "json": {
+          "appId": "wowoohr_my_rm",
+          "orderId": "$orderId2",
+          "danlihuType": 1
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ],
+      "teardown_hooks": [
+          "${teardown_hook_sleep_N_secs($response, 2)}"
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取该投保员工信息",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "$userId"
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfInfo.status",
+            "4"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfInfo.subStatus",
+            "0"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssInfo.status",
+            "4"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssInfo.subStatus",
+            "0"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "合并停保-社保",
+      "request": {
+        "url": "queryDimissionExcelInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "$userId"
+        }
+      },
+      "extract": [
+        {
+          "hfInsureId": "content.result.data.0.hfId",
+          "hfStartDate":"content.result.data.0.hfLastPayMonth",
+          "ssInsureId":"content.result.data.0.ssId",
+          "ssStartDate":"content.result.data.0.ssLastPayMonth"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "批量停保",
+      "request": {
+        "url": "batchStopInsured",
+        "method": "POST",
+        "json": [
+          {
+            "userId": "$userId",
+            "userName": "$userName",
+            "leavingDay": "${timeToday()}",
+            "ssInsureId": "$ssInsureId",
+            "code": 0,
+            "text": "",
+            "ssStartDate": "$ssStartDate",
+            "hfInsureId": "$hfInsureId",
+            "hfStartDate": "$hfStartDate",
+            "isStopSS": true,
+            "isStopHF": true
+          }
+        ]
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取该停保员工信息",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "$userId"
+        }
+      },
+      "extract": [
+        {
+          "hf_ssId1": "content.result.data.0.hfInfo.ssId",
+          "ss_ssId1": "content.result.data.0.ssInfo.ssId"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfInfo.status",
+            "7"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfInfo.subStatus",
+            "0"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssInfo.status",
+            "7"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssInfo.subStatus",
+            "0"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "V-减员订单",
+      "request": {
+        "url": "http://test-hradmin.renliwo.com/rest/api/0.2/v.web.termination.getToDoOrderList",
+        "method": "POST",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie2",
+          "Content-Type": "$contentType",
+          "X-CSRF-TOKEN": "$TOKEN"
+        },
+        "json": {
+          "appId": "wowoohr_my_rm",
+          "productType": [
+          ],
+          "lastPayMonth": "",
+          "cityList": [
+          ],
+          "nameOrIdCard": "",
+          "pageNum": 1,
+          "pageSize": 20,
+          "danlihuType": 1
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "V-筛选出员工减员账单",
+      "request": {
+        "url": "http://test-hradmin.renliwo.com/rest/api/0.2/v.web.termination.getToDoOrderList",
+        "method": "POST",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie2",
+          "Content-Type": "$contentType",
+          "X-CSRF-TOKEN": "$TOKEN"
+        },
+        "json": {
+          "appId": "wowoohr_my_rm",
+          "productType": [
+          ],
+          "lastPayMonth": "",
+          "cityList": [
+          ],
+          "nameOrIdCard": "$userName",
+          "pageNum": 1,
+          "pageSize": 20,
+          "danlihuType": 1
+        }
+      },
+      "extract": [
+        {
+          "ss_declarationId": "content.result.list.0.declarationId",
+          "hf_declarationId": "content.result.list.1.declarationId"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "V-减员完成-社保",
+      "request": {
+        "url": "http://test-hradmin.renliwo.com/rest/api/0.2/v.web.termination.complete",
+        "method": "POST",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie2",
+          "Content-Type": "$contentType",
+          "X-CSRF-TOKEN": "$TOKEN"
+        },
+        "json": {
+          "appId": "wowoohr_my_rm",
+          "declarationId": "$ss_declarationId",
+          "danlihuType": 1
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "V-减员完成-公积金",
+      "request": {
+        "url": "http://test-hradmin.renliwo.com/rest/api/0.2/v.web.termination.complete",
+        "method": "POST",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie2",
+          "Content-Type": "$contentType",
+          "X-CSRF-TOKEN": "$TOKEN"
+        },
+        "json": {
+          "appId": "wowoohr_my_rm",
+          "declarationId": "$hf_declarationId",
+          "danlihuType": 1
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "筛选员工--确认员工已停保状态",
+      "request": {
+        "url": "queryOnWorkEmpInsuredInfos",
+        "method": "GET",
+        "json": {
+          "userIds": "$userId",
+          "page": 1,
+          "pageSize": 10
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ],
+          "eq": [
+            "content.result.data.0.hfInfo.status",
+            "8"
+          ],
+          "eq": [
+            "content.result.data.0.ssInfo.status",
+            "8"
+          ]
+        }
+      ]
+    }
+  }
+]

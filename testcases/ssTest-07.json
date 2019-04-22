@@ -1,0 +1,275 @@
+[
+  {
+    "config": {
+      "name": "新建参保方案",
+      "variables": [
+        {
+          "eq": [
+            "status_code",
+            200
+          ]
+        }
+      ],
+      "request": {
+        "base_url": "$base_url",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie1",
+          "X-csrf-token": "$token",
+          "Content-Type": "$contentType"
+        }
+      }
+    }
+  },
+  {
+    "test": {
+      "name": "获取城市code-上海",
+      "request": {
+        "url": "https://test-ss.renlijia.com/rest/api/v2.0/getSelfCities",
+        "method": "GET",
+        "json": {
+
+        }
+      },
+      "extract": [
+        {
+          "cityCode": "content.result.allCities.133.cityCode",
+          "cityName": "content.result.allCities.133.cityName",
+          "simpleEn": "content.result.allCities.133.simpleEn",
+          "en": "content.result.allCities.133.en"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取城市方案",
+      "request": {
+        "url": "self_querySsAndHfGroupList",
+        "method": "GET",
+        "json": {
+          "cityCode": "$cityCode"
+        }
+      },
+      "extract": [
+        {
+          "hfGroupCode": "content.result.hfGroupList.0.groupCode",
+          "hfGroupName": "content.result.hfGroupList.0.groupName",
+          "ssGroupCode": "content.result.ssGroupList.0.groupCode",
+          "ssGroupName": "content.result.ssGroupList.0.groupName"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "社保方案--养老",
+      "request": {
+        "url": "self_querySsAndHfItemList",
+        "method": "GET",
+        "json": {
+          "groupCode": "$ssGroupCode"
+        }
+      },
+      "extract": [
+        {
+          "ssItemCode": "content.result.0.itemCode",
+          "ssItemName": "content.result.0.itemName",
+          "ssPersonBaseUpper": "content.result.0.personBaseUpper",
+          "ssPersonBaseLower": "content.result.0.personBaseLower",
+          "ssPersonPayRatio": "content.result.0.personPayRatio",
+          "ssPersonFixedAmount": "content.result.0.personFixedAmount",
+          "ssPersonCarryRule": "content.result.0.personCarryRule",
+          "ssCorpBaseUpper": "content.result.0.corpBaseUpper",
+          "ssCorpBaseLower": "content.result.0.corpBaseLower",
+          "ssCorpPayRatio": "content.result.0.corpPayRatio",
+          "ssCorpFixedAmount": "content.result.0.corpFixedAmount",
+          "ssCorpCarryRule": "content.result.0.corpCarryRule"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "公积金方案--公积金",
+      "request": {
+        "url": "self_querySsAndHfItemList",
+        "method": "GET",
+        "json": {
+          "groupCode": "$hfGroupCode"
+        }
+      },
+      "extract": [
+        {
+          "hfItemCode":"content.result.0.itemCode",
+          "hfItemName":"content.result.0.itemName",
+          "hfPersonBaseUpper":"content.result.0.personBaseUpper",
+          "hfPersonBaseLower":"content.result.0.personBaseLower",
+          "hfPersonPayRatio":"content.result.0.personPayRatio",
+          "hfPersonFixedAmount":"content.result.0.personFixedAmount",
+          "hfPersonCarryRule":"content.result.0.personCarryRule",
+          "hfCorpBaseUpper":"content.result.0.corpBaseUpper",
+          "hfCorpBaseLower":"content.result.0.corpBaseLower",
+          "hfCorpPayRatio":"content.result.0.corpPayRatio",
+          "hfCorpFixedAmount":"content.result.0.corpFixedAmount",
+          "hfCorpCarryRule":"content.result.0.corpCarryRule"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "保存参保方案",
+      "request": {
+        "url": "self_saveScheme",
+        "method": "POST",
+        "json": {
+          "cityName": "$cityName",
+          "cityCode": "$cityCode",
+          "serviceCharge": "",
+          "ssInsureInfoModel": {
+            "templateId": "$ssGroupCode",
+            "schemeId": "",
+            "schemeName": "德玛西亚--社保",
+            "corpTotalCarryRule": "1",
+            "personTotalCarryRule": "1",
+            "itemDetails": [
+              {
+                "itemCode": "insurancePension",
+                "itemName": "养老",
+                "corpBaseLower": "$ssCorpBaseLower",
+                "corpBaseUpper": "$ssCorpBaseUpper",
+                "corpCarryRule": "$ssCorpCarryRule",
+                "corpFixedAmount": "$ssCorpFixedAmount",
+                "corpPayRatio": "$ssCorpPayRatio",
+                "personCarryRule": "$ssPersonCarryRule",
+                "personFixedAmount": "$ssPersonFixedAmount",
+                "personPayRatio": "$ssPersonPayRatio"
+              }
+            ]
+          },
+          "hfInsureInfoModel": {
+            "templateId": "hfGroupCode",
+            "schemeId": "",
+            "schemeName": "德玛西亚--公积金",
+            "corpTotalCarryRule": "1",
+            "personTotalCarryRule": "1",
+            "itemDetails": [
+              {
+                "itemCode": "insuranceHousingFund",
+                "itemName": "公积金",
+                "corpBaseLower": "$hfCorpBaseLower",
+                "corpBaseUpper": "$hfCorpBaseUpper",
+                "corpCarryRule": "$hfCorpCarryRule",
+                "corpFixedAmount": "$hfCorpFixedAmount",
+                "corpPayRatio": "$hfCorpPayRatio",
+                "personCarryRule": "$hfPersonCarryRule",
+                "personFixedAmount": "$hfPersonFixedAmount",
+                "personPayRatio": "$hfPersonPayRatio"
+              }
+            ]
+          }
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取城市参保方案",
+      "request": {
+        "url": "self_queryScheme",
+        "method": "POST",
+        "json": {
+
+        }
+      },
+      "extract": [
+        {
+          "hfSchemeId": "content.result.data.0.hfScheme.schemeId",
+          "ssSchemeId": "content.result.data.0.ssScheme.schemeId"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.hfScheme.schemeName",
+            "德玛西亚--公积金"
+          ]
+        },
+        {
+          "eq": [
+            "content.result.data.0.ssScheme.schemeName",
+            "德玛西亚--社保"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "删除新建方案",
+      "request": {
+        "url": "self_deletedScheme",
+        "method": "POST",
+        "json": {
+          "ssSchemeId":"$ssSchemeId",
+          "hfSchemeId":"$hfSchemeId"
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  }
+]

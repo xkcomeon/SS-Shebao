@@ -1,0 +1,170 @@
+[
+  {
+    "config": {
+      "name": "权限设置--胡正",
+      "variables": [
+        {
+          "eq": [
+            "status_code",
+            200
+          ]
+        }
+      ],
+      "request": {
+        "base_url": "$base_url",
+        "headers": {
+          "User-Agent": "$userAgent",
+          "Cookie": "$cookie1",
+          "X-csrf-token": "$token",
+          "Content-Type": "$contentType"
+        }
+      }
+    }
+  },
+  {
+    "test": {
+      "name": "获取当前登录用户权限",
+      "request": {
+        "url": "/p_getCurrentUserAuth",
+        "method": "GET",
+        "json": {
+        }
+      },
+      "extract": [
+        {
+          "roleKeys": "content.result.roleKeys"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ],
+          "eq": [
+            "content.result.roleKeys.0",
+            "ss_admin"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "修改员工权限--胡正",
+      "request": {
+        "url": "saveSSubAdmin",
+        "method": "POST",
+        "json": {
+          "userId": "17370449061050274",
+          "openAuth": true
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取胡正用户权限",
+      "request": {
+        "url": "/p_getCurrentUserAuth",
+        "method": "GET",
+        "headers": {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.2 Safari/605.1.15",
+          "Cookie": "N3=FC92F66C80E14C9B7730B9B5E17A858BE22F312277C50C67160756B03EBC3DB0C9ACB2928F2E5DE7F56D66A641E74C185F8223015EAA13FD80D150683547DDD4528357B8FC0CC0F41639E3281C81CB121AF5530D70A23D03C17B16296EC501E7C4F2732DC0B4763406299BC0C38F4456; N1=9ad0937bb08e6c4e8; N2=027F06055F0A2C03564D9E763AA983D3BCDA942DCE3C366467BB40AF346BB64BE96793FEB0AE4E2BF85EAF940A2CC25F995F42A61B4B65CBC038019AF8966D847183DFFF7355553ED10F9DB5B2F80D99BCE71C6B5977A0F2CAAC6EE43D850B3928128F0C6F5257455B6981D9DB4BD13B313D18680CADB9E594B1030E5445EED18614B7D8DA127DF41F5DBA8342AB7ABF2E21E7798A962C67D129E10533FB56CA520584E75FB5871C95993C9AC7E2046D39BF35659942E7E881773DA3F80A597967B9D34ABB519E6245ECFA7734A6E4BFCD533057872DB26D09E4EF22968836928FB55F7BCA9EA09A0B9875C40F4D859D6E07C75DF699FCC2951F3DFE34826142445C9E69A5C8B74C9BCB24D218334DA34BDD6DD19D860E177E645CD322FF9B301B088F77F37A8A16518BBBD633F826EF2272CD81B4C4FF4BC5354BC14B24A21928E7FEAA2DA18932A43B916816CC7D3C3814BC1E28DC4ADD0B0EEF513822EDBC06299BC0C38F4456",
+          "X-csrf-token": null,
+          "Content-Type": "application/json;charset=UTF-8"
+        },
+        "json": {
+        }
+      },
+      "extract": [
+        {
+          "roleKeys": "content.result.roleKeys"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ],
+          "eq": [
+            "content.result.roleKeys.0",
+            "ss_sub_admin"
+          ],
+          "eq": [
+            "content.result.roleKeys.1",
+            "dd_sub_admin"
+          ],
+          "eq": [
+            "content.result.roleKeys.2",
+            "ss_user"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "修改员工权限--胡正",
+      "request": {
+        "url": "saveSSubAdmin",
+        "method": "POST",
+        "json": {
+          "userId": "17370449061050274",
+          "openAuth": false
+        }
+      },
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "test": {
+      "name": "获取当前登录用户权限",
+      "request": {
+        "url": "/p_getCurrentUserAuth",
+        "method": "GET",
+        "headers": {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.2 Safari/605.1.15",
+          "Cookie": "N3=FC92F66C80E14C9B7730B9B5E17A858BE22F312277C50C67160756B03EBC3DB0C9ACB2928F2E5DE7F56D66A641E74C185F8223015EAA13FD80D150683547DDD4528357B8FC0CC0F41639E3281C81CB121AF5530D70A23D03C17B16296EC501E7C4F2732DC0B4763406299BC0C38F4456; N1=9ad0937bb08e6c4e8; N2=027F06055F0A2C03564D9E763AA983D3BCDA942DCE3C366467BB40AF346BB64BE96793FEB0AE4E2BF85EAF940A2CC25F995F42A61B4B65CBC038019AF8966D847183DFFF7355553ED10F9DB5B2F80D99BCE71C6B5977A0F2CAAC6EE43D850B3928128F0C6F5257455B6981D9DB4BD13B313D18680CADB9E594B1030E5445EED18614B7D8DA127DF41F5DBA8342AB7ABF2E21E7798A962C67D129E10533FB56CA520584E75FB5871C95993C9AC7E2046D39BF35659942E7E881773DA3F80A597967B9D34ABB519E6245ECFA7734A6E4BFCD533057872DB26D09E4EF22968836928FB55F7BCA9EA09A0B9875C40F4D859D6E07C75DF699FCC2951F3DFE34826142445C9E69A5C8B74C9BCB24D218334DA34BDD6DD19D860E177E645CD322FF9B301B088F77F37A8A16518BBBD633F826EF2272CD81B4C4FF4BC5354BC14B24A21928E7FEAA2DA18932A43B916816CC7D3C3814BC1E28DC4ADD0B0EEF513822EDBC06299BC0C38F4456",
+          "X-csrf-token": null,
+          "Content-Type": "application/json;charset=UTF-8"
+        },
+        "json": {
+        }
+      },
+      "extract": [
+        {
+          "roleKeys": "content.result.roleKeys"
+        }
+      ],
+      "validate": [
+        {
+          "eq": [
+            "content.success",
+            true
+          ],
+          "eq": [
+            "content.result.sAdmin",
+            null
+          ]
+        }
+      ]
+    }
+  }
+]
